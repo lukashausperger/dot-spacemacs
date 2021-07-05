@@ -1,17 +1,18 @@
+[![Build Status][github-actions-badge]][github-actions-link]
 # dot-spacemacs
+
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
 - [dot-spacemacs](#dot-spacemacs)
-    - [Requirements](#requirements)
-        - [Emacs26](#emacs26)
-        - [Spacemacs](#spacemacs)
-        - [gcc-7](#gcc-7)
-        - [Fonts](#fonts)
     - [Installation](#installation)
+        - [Automatic](#automatic)
+        - [Manuel](#manuel)
+            - [Requirements](#requirements)
+            - [Configuration](#configuration)
     - [Tips and tricks](#tips-and-tricks)
-        - [CCLS](#ccls)
-        - [Markdown live preview with glow](#markdown-live-preview-with-glow)
+        - [ccls](#ccls)
+        - [Markdown live preview](#markdown-live-preview)
 
 <!-- markdown-toc end -->
 
@@ -19,60 +20,65 @@ This is the repository of a personal spacemacs config file. It contains a fully 
 
 The content of the configuration can be found in the [spacemacs.org](spacemacs.org "Spacemacs configuration in org file") file.
 
-## Requirements
-### Emacs27
-To install emacs27:
-```
-sudo snap install emacs --candidate --classic
-```
-### Spacemacs
-```
-git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d
-cd ~/.emacs.d
-git checkout develop
-```
-
-### gcc-7
-gcc-7 is need to compile `ccls`. Run the following in the terminal:
-
-Install the gcc-7 packages:
-
-    sudo apt-get install -y software-properties-common
-    sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-    sudo apt update
-    sudo apt install g++-7 -y
-
-Set it up so the symbolic links `gcc`, `g++` point to the newer version:
-
-    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
-                             --slave /usr/bin/g++ g++ /usr/bin/g++-7
-    sudo update-alternatives --config gcc
-    gcc --version
-    g++ --version
-
-### Fonts
-In `emacs`, run `M-x all-the-icons-install-fonts`.
-
-
 ## Installation
-To use this config file:
+
+### Automatic
+
+If you are using `Ubuntu 18.04` or `Ubuntu 20.04`, you can install the entire setup, including `emacs`, `spacemacs`, utility packages etc, using the following simple command:
+
+```sh
+curl -o- https://raw.githubusercontent.com/Maverobot/dot-spacemacs/master/installer.sh | bash
 ```
-git clone https://github.com/Maverobot/dot-spacemacs.git ~/.spacemacs.d
 
-# Backup your ~/.spacemacs file somewhere. The spacemacs will now use ~/.spacemacs.d/init.el automatically.
-mv ~/.spacemacs ~/.spacemacs.bk
+Root privileges will be needed by the script for package installation via `apt`, `snap` and `dpkg`. When in doubt, feel free to check out [installer.sh][installer.sh].
 
-# Setup everything including ccls
-cd ~/.spacemacs.d
-./setup.sh
 
-# Setup only ccls for c/c++ IDE
-cd ~/.spacemacs.d
-./build_ccls.sh
-```
+### Manuel
+
+#### Requirements
+
+* Emacs
+  ```sh
+  sudo snap install emacs --classic
+  ```
+
+* Spacemacs
+  ```sh
+  git clone https://github.com/syl20bnr/spacemacs -b develop ~/.emacs.d
+  ```
+
+* `gcc` >= 7.5 is needed to compile `ccls`. See [here][gcc-installation] for installation guide.
+
+* Fonts for the themes:
+
+  ```sh
+  emacs -u $(id -un) --batch --eval '(all-the-icons-install-fonts t)'
+  ```
+
+#### Configuration
+
+* Clone the repo
+  ```sh
+  git clone https://github.com/Maverobot/dot-spacemacs.git ~/.spacemacs.d
+  ```
+
+* Backup your `~/.spacemacs` file somewhere. The spacemacs will now use `~/.spacemacs.d/init.el` as the init-file instead.
+  ```sh
+  mv ~/.spacemacs ~/.spacemacs.bk
+  ```
+
+* Setup everything including ccls
+  ```sh
+  cd ~/.spacemacs.d && ./setup.sh
+  ```
+
+* Setup only ccls for c/c++ IDE
+  ```sh
+  cd ~/.spacemacs.d && ./build_ccls.sh
+  ```
 
 ## Tips and tricks
-### CCLS
+### ccls
 For language server to work, it is necessary to compile the projects with flag `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`. Take cmake project for example,
 
 ```sh
@@ -82,28 +88,18 @@ mkdir build && cd build
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 ```
 
-### Markdown live preview with glow
-To use it, simply in the markdown buffer run elisp function `start_glow_viewer`, which is defined in `.spacemacs`.
+### Markdown live preview
+Call `M-x start_glow_viewer` in a markdown buffer. See [here][start-glow-viewer] for details.
 
-* Install [glow](https://github.com/charmbracelet/glow):
+In order to use this feature, `glow` has to be installed manually.
 
 ```sh
-# MacOS
-brew install charmbracelet/homebrew-tap/glow
-
-# Arch Linux (btw)
-yay -S glow
-
-# FreeBSD
-pkg install glow
-
-# Ubuntu
 sudo snap install go --classic
 go get github.com/charmbracelet/glow
 ```
 
-* Install [entr](https://github.com/clibs/entr):
-
-```sh
-sudo apt install entr
-```
+[github-actions-badge]: https://github.com/maverobot/dot-spacemacs/actions/workflows/main.yml/badge.svg?branch=master
+[github-actions-link]: https://github.com/Maverobot/dot-spacemacs/actions
+[installer.sh]: https://raw.githubusercontent.com/Maverobot/dot-spacemacs/master/installer.sh
+[gcc-installation]: https://github.com/Maverobot/dot-spacemacs/blob/master/docs/gcc_installation.md
+[start-glow-viewer]: https://github.com/Maverobot/dot-spacemacs/blob/master/spacemacs.org#glow-the-markdown-viewer

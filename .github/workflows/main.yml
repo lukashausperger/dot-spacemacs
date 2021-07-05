@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  installer-check:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-18.04]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+
+      - name: Cache the spacemacs repository folder
+        uses: actions/cache@v2
+        with:
+          path: ~/.emacs.d
+          key: saved-emacs-d-${{ matrix.os }}
+
+      - name: Create a placeholder folder for org-roam
+        run: mkdir ~/org/home/roam -p
+
+      - name: Install everything needed for the spacemacs config
+        run: curl -o- https://raw.githubusercontent.com/Maverobot/dot-spacemacs/${GITHUB_REF##*/}/installer.sh | tee /dev/tty | bash
+
+      - name: Copy the generated index.html to the checked out repo path
+        run: |
+          mkdir ~/work/dot-spacemacs/dot-spacemacs/public
+          cp ~/.spacemacs.d/docs/index.html ~/work/dot-spacemacs/dot-spacemacs/public
+
+      - name: GitHub Pages
+        if: matrix.os == 'ubuntu-18.04' && success()
+        uses: crazy-max/ghaction-github-pages@v2.5.0
+        with:
+          target_branch: gh-pages
+          build_dir: public
+          jekyll: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
